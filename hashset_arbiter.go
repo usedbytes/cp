@@ -1,5 +1,7 @@
 package cp
 
+import "fmt"
+
 type HashSetEqualArbiter func(ptr ShapePair, elt *Arbiter) bool
 type HashSetTransArbiter func(ptr ShapePair, space *Space) *Arbiter
 type HashSetIteratorArbiter func(elt *Arbiter)
@@ -250,6 +252,7 @@ func CachedArbitersFilter(arb *Arbiter, space *Space, shape *Shape, body *Body) 
 		// Call separate when removing shapes.
 		if shape != nil && arb.state != CP_ARBITER_STATE_CACHED {
 			// Invalidate the arbiter since one of the shapes was removed
+			fmt.Printf("Invalidate Arbiter %p\n", arb)
 			arb.state = CP_ARBITER_STATE_INVALIDATED
 
 			handler := arb.handler

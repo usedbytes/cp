@@ -342,6 +342,8 @@ func (body *Body) SetTransform(p Vector, a float64) {
 }
 
 func (body *Body) Activate() {
+	fmt.Printf(">>> Activate %p\n", body)
+	defer fmt.Printf("<<< Activate %p\n", body)
 	if !(body != nil && body.GetType() == BODY_DYNAMIC) {
 		return
 	}
@@ -373,6 +375,10 @@ func (body *Body) Activate() {
 	}
 
 	for arbiter := body.arbiterList; arbiter != nil; arbiter = arbiter.Next(body) {
+		fmt.Printf("Arbiter %p %#v\n", arbiter, arbiter)
+		if arbiter.Next(body) == arbiter {
+			panic("Arbiter loop")
+		}
 		// Reset the idle timer of things the body is touching as well.
 		// That way things don't get left hanging in the air.
 		var other *Body
@@ -428,7 +434,12 @@ func (body *Body) KineticEnergy() float64 {
 }
 
 func (body *Body) PushArbiter(arb *Arbiter) {
+	fmt.Printf("PushArbiter Body: %p\n %p %#v\n", body, arb, arb)
 	next := body.arbiterList
+	if next == arb {
+		fmt.Printf("Pushing arbiter already there %p == %p \n%#v\n%#v\n", next, arb, next, arb)
+		panic("pushing already there")
+	}
 	arb.ThreadForBody(body).next = next
 	if next != nil {
 		next.ThreadForBody(body).prev = arb

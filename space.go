@@ -1,6 +1,7 @@
 package cp
 
 import (
+	"fmt"
 	"math"
 	"unsafe"
 )
@@ -179,6 +180,10 @@ func (space *Space) Activate(body *Body) {
 			// update arbiters state
 			arbiter.stamp = space.stamp
 			space.arbiters = append(space.arbiters, arbiter)
+			fmt.Println("Activate. Arbiters:")
+			for i, p := range space.arbiters {
+				fmt.Printf("%d: %p\n", i, p)
+			}
 		}
 	}
 
@@ -419,6 +424,9 @@ func SpaceCollideShapesFunc(obj interface{}, b *Shape, collisionId uint32, vspac
 	a := obj.(*Shape)
 	space := vspace.(*Space)
 
+	fmt.Printf(">>> SpaceCollideShapesFunc %p %p\n", a, b)
+	defer fmt.Printf("<<< SpaceCollideShapesFunc %p %p\n", a, b)
+
 	// Reject any of the simple cases
 	if QueryReject(a, b) {
 		return collisionId
@@ -462,6 +470,10 @@ func SpaceCollideShapesFunc(obj interface{}, b *Shape, collisionId uint32, vspac
 	// This includes collisions between two kinematic bodies, or a kinematic body and a static body.
 		!(a.body.m == INFINITY && b.body.m == INFINITY) {
 		space.arbiters = append(space.arbiters, arb)
+		fmt.Println("SpaceCollideShapesFunc. Arbiters:")
+		for i, p := range space.arbiters {
+			fmt.Printf("%d: %p\n", i, p)
+		}
 	} else {
 		space.PopContacts(info.count)
 		arb.contacts = nil
@@ -565,7 +577,9 @@ func (space *Space) ProcessComponents(dt float64) {
 	}
 
 	// Awaken any sleeping bodies found and then push arbiters to the bodies' lists.
-	for _, arb := range space.arbiters {
+	fmt.Println("Ranging Space Arbiters")
+	for i, arb := range space.arbiters {
+		fmt.Printf("%d: %p\n", i, arb)
 		a := arb.body_a
 		b := arb.body_b
 
