@@ -873,8 +873,16 @@ func (space *Space) NewWildcardCollisionHandler(collisionType CollisionType) *Co
 func (space *Space) UseWildcardDefaultHandler() {
 	if !space.usesWildcards {
 		space.usesWildcards = true
-		space.defaultHandler = &CollisionHandlerDefault
+		// Make a copy so we don't accidentally mutate the global struct
+		// by returning it from AddDefaultCollisionHandler
+		handler := CollisionHandlerDefault
+		space.defaultHandler = &handler
 	}
+}
+
+func (space *Space) AddDefaultCollisionHandler() *CollisionHandler {
+	space.UseWildcardDefaultHandler()
+	return space.defaultHandler
 }
 
 func (space *Space) UseSpatialHash(dim float64, count int) {
